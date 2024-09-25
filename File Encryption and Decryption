@@ -1,0 +1,91 @@
+package com.encryption;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Scanner;
+
+public class FileEncryptionDecryption {
+
+    // Caesar Cipher encryption function
+    public static String encrypt(String data, int shift) {
+        StringBuilder encrypted = new StringBuilder();
+        
+        for (char c : data.toCharArray()) {
+            if (Character.isLetter(c)) {
+                char base = Character.isLowerCase(c) ? 'a' : 'A';
+                c = (char) ((c - base + shift) % 26 + base);
+            }
+            encrypted.append(c);
+        }
+        
+        return encrypted.toString();
+    }
+
+    // Caesar Cipher decryption function
+    public static String decrypt(String data, int shift) {
+        return encrypt(data, 26 - shift);  // Decrypting is just reversing the shift
+    }
+
+    // Method to read file contents
+    public static String readFile(String filePath) throws IOException {
+        return new String(Files.readAllBytes(new File(filePath).toPath()));
+    }
+
+    // Method to write to file
+    public static void writeFile(String filePath, String data) throws IOException {
+        FileWriter writer = new FileWriter(filePath);
+        writer.write(data);
+        writer.close();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            // Ask the user for encryption or decryption
+            System.out.println("Choose an option (1-Encrypt, 2-Decrypt): ");
+            int option = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            // Ask for file input
+            System.out.println("Enter the file path: ");
+            String inputFilePath = scanner.nextLine();
+
+            // Ask for the output file path
+            System.out.println("Enter the output file path: ");
+            String outputFilePath = scanner.nextLine();
+
+            // Ask for shift value (for Caesar Cipher)
+            System.out.println("Enter the shift value (for Caesar Cipher): ");
+            int shift = scanner.nextInt();
+
+            // Read the file contents
+            String fileContent = readFile(inputFilePath);
+
+            // Encrypt or decrypt based on user's choice
+            String result;
+            if (option == 1) {
+                result = encrypt(fileContent, shift);
+                System.out.println("File encrypted successfully.");
+            } else if (option == 2) {
+                result = decrypt(fileContent, shift);
+                System.out.println("File decrypted successfully.");
+            } else {
+                System.out.println("Invalid option selected.");
+                return;
+            }
+
+            // Write the encrypted or decrypted content to the output file
+            writeFile(outputFilePath, result);
+
+            System.out.println("Operation completed. Check the output file at: " + outputFilePath);
+
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
+    }
+}
